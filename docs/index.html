@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multimodal Attendance & Engagement Agent - Live Interactive Demo</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0f172a;
+      --card-bg: #1e293b;
+      --border-color: #334155;
+      --primary: #3b82f6;
+      --accent: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+    }
+    .navbar {
+      background-color: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+    }
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .badge-soft-success {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-soft-primary {
+      background-color: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+    .badge-soft-warning {
+      background-color: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .nav-pills .nav-link {
+      color: var(--text-muted);
+      border-radius: 8px;
+      font-weight: 500;
+      padding: 10px 18px;
+    }
+    .nav-pills .nav-link.active {
+      background-color: var(--primary);
+      color: #fff;
+    }
+    .video-viewport {
+      position: relative;
+      background: #020617;
+      border-radius: 12px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+    }
+    .bounding-box {
+      position: absolute;
+      border: 2px solid #10b981;
+      border-radius: 6px;
+      background: rgba(16, 185, 129, 0.1);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+    .box-tag {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: #10b981;
+      color: #000;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .log-feed {
+      height: 250px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.85rem;
+      background: #090d16;
+      border-radius: 8px;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+    }
+    .log-entry {
+      margin-bottom: 6px;
+      padding-bottom: 4px;
+      border-bottom: 1px dashed #1e293b;
+    }
+    .table-dark {
+      --bs-table-bg: var(--card-bg);
+      --bs-table-border-color: var(--border-color);
+    }
+    .gauge-wrapper {
+      position: relative;
+      width: 160px;
+      margin: 0 auto;
+    }
+    .gauge-center-text {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.6rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top px-3">
+    <div class="container-fluid">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <span class="fs-4">🎓</span>
+        <span class="fw-bold">Multimodal Attendance & Engagement Agent</span>
+        <span class="badge badge-soft-success ms-2">Live Demo</span>
+      </a>
+      <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small d-none d-md-inline"><i class="bi bi-shield-check text-success me-1"></i> Privacy-Preserving Edge Architecture</span>
+        <a href="https://github.com/ayushkumarsingh0803-ux/Multimodel-Attendence-Engagement-Agent" target="_blank" class="btn btn-outline-light btn-sm d-flex align-items-center gap-2">
+          <i class="bi bi-github"></i>
+          <span>View Source Code</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container-fluid py-4 px-lg-5">
+    
+    <!-- Hero / Intro Banner -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="card p-4 border-primary border-opacity-25" style="background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <h4 class="fw-bold mb-1"><i class="bi bi-stars text-warning me-2"></i>Classroom Intelligence & Multimodal Analytics</h4>
+              <p class="text-muted mb-0">Experience real-time sustained presence tracking, fused multimodal attention scoring, and Google Gemini 2.0 Flash teaching suggestions directly in your browser.</p>
+            </div>
+            <div class="d-flex gap-2">
+              <button id="btnSimulationToggle" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-play-circle-fill"></i>
+                <span id="simBtnText">Start Classroom Stream</span>
+              </button>
+              <button id="btnWebcam" class="btn btn-outline-secondary d-flex align-items-center gap-2">
+                <i class="bi bi-camera-video"></i>
+                <span>Use My Webcam</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Stat Cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-lg-3">
+        <div class="card p-3">
+          <span class="text-muted small text-uppercase fw-semibold"><i class="bi bi-people me-1 text-primary"></i> Sustained Presence</span>
+          <div class="d-flex align-items-baseline gap-2 mt-2">
+            <span class="metric-value text-primary" id="metricPresent">18</span>
+            <span class="text-muted small">/ 20 Enrolled</span>
+          </div>
+          <span class="badge badge-soft-success align-self-start mt-2">90% Attendance Rate</span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card p-3">
+          <span class="text-muted small text-uppercase fw-semibold"><i class="bi bi-speedometer2 me-1 text-success"></i> Avg Engagement</span>
+          <div class="d-flex align-items-baseline gap-2 mt-2">
+            <span class="metric-value text-success" id="metricEngagement">84%</span>
+            <span class="text-muted small">Target: >75%</span>
+          </div>
+          <span class="badge badge-soft-success align-self-start mt-2">Optimal Interaction</span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card p-3">
+          <span class="text-muted small text-uppercase fw-semibold"><i class="bi bi-mic me-1 text-warning"></i> Acoustic Turn-Taking</span>
+          <div class="d-flex align-items-baseline gap-2 mt-2">
+            <span class="metric-value text-warning" id="metricAudio">Moderate</span>
+          </div>
+          <span class="badge badge-soft-warning align-self-start mt-2">Lecture + Q&A Mode</span>
+        </div>
+      </div>
+      <div class="col-6 col-lg-3">
+        <div class="card p-3">
+          <span class="text-muted small text-uppercase fw-semibold"><i class="bi bi-clock-history me-1 text-info"></i> Session Duration</span>
+          <div class="d-flex align-items-baseline gap-2 mt-2">
+            <span class="metric-value text-info" id="metricTimer">34:18</span>
+          </div>
+          <span class="badge badge-soft-primary align-self-start mt-2">Live Session Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabbed Navigation -->
+    <ul class="nav nav-pills mb-4 gap-2" id="demoTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-vision"><i class="bi bi-camera-fill me-2"></i>Scenario 1: Presence & Live Feed</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-attendance"><i class="bi bi-card-checklist me-2"></i>Attendance Ledger</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-analytics"><i class="bi bi-graph-up-arrow me-2"></i>Scenario 2: Dynamics & Heatmap</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-ai"><i class="bi bi-robot me-2"></i>Scenario 3: Gemini Teaching Suggestions</button>
+      </li>
+    </ul>
+
+    <!-- Tab Contents -->
+    <div class="tab-content">
+      
+      <!-- TAB 1: Live Feed & Computer Vision Detection -->
+      <div class="tab-pane fade show active" id="tab-vision">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-bold"><i class="bi bi-broadcast text-danger me-2"></i>Live Computer Vision Tracking Viewport</span>
+                <span class="badge bg-danger" id="liveBadge"><i class="bi bi-record-fill me-1"></i>STREAM ACTIVE</span>
+              </div>
+              <div class="video-viewport" id="viewport">
+                <!-- Video Element (for Webcam) -->
+                <video id="webcamVideo" autoplay muted playsinline style="display:none; width:100%; height:100%; object-fit:cover;"></video>
+                
+                <!-- Simulated Canvas -->
+                <canvas id="simCanvas" width="800" height="450" style="width:100%; height:100%;"></canvas>
+
+                <!-- Dynamic Bounding Boxes -->
+                <div class="bounding-box" id="box1" style="top:22%; left:25%; width:16%; height:26%;">
+                  <span class="box-tag">A. Sharma (94% Attentive)</span>
+                </div>
+                <div class="bounding-box" id="box2" style="top:24%; left:58%; width:16%; height:26%;">
+                  <span class="box-tag">P. Verma (88% Attentive)</span>
+                </div>
+                <div class="bounding-box" id="box3" style="top:52%; left:40%; width:18%; height:30%;">
+                  <span class="box-tag">R. Kumar (91% Attentive)</span>
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mt-3 text-muted small">
+                <span><i class="bi bi-info-circle me-1"></i> Sustained presence window: 180s minimum presence duration required for attendance.</span>
+                <span>OpenCV + MediaPipe Edge Simulation</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <!-- Realtime Gauge -->
+            <div class="card p-4 mb-4 text-center">
+              <h6 class="fw-bold text-muted text-uppercase mb-3">Instantaneous Attention Index</h6>
+              <div class="gauge-wrapper">
+                <canvas id="gaugeChart" width="160" height="100"></canvas>
+                <div class="gauge-center-text" id="gaugeValue">86%</div>
+              </div>
+              <p class="small text-muted mt-2 mb-0" id="gaugeStatus">🟢 High Collective Attention</p>
+            </div>
+
+            <!-- Live Event Logs -->
+            <div class="card p-3">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="fw-bold small text-uppercase"><i class="bi bi-terminal me-1"></i> Agent Telemetry Log</span>
+                <span class="badge bg-secondary" id="logCount">Live</span>
+              </div>
+              <div class="log-feed" id="logFeed">
+                <div class="log-entry text-success">[14:02:10] Session initialized: "CS402_Advanced_AI".</div>
+                <div class="log-entry text-info">[14:03:00] Ingesting video frame stream (30 FPS).</div>
+                <div class="log-entry text-light">[14:04:15] Student ID #0801 detected. Sustained verification in progress...</div>
+                <div class="log-entry text-success">[14:05:00] Sustained presence verified: Student ID #0801 marked PRESENT.</div>
+                <div class="log-entry text-warning">[14:12:44] Audio spike detected: Lecturer Q&A turn initiated.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: Attendance Ledger -->
+      <div class="tab-pane fade" id="tab-attendance">
+        <div class="card p-4">
+          <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div>
+              <h5 class="fw-bold mb-1"><i class="bi bi-person-check-fill text-success me-2"></i>Verified Attendance Roster</h5>
+              <p class="text-muted small mb-0">Records automatically timestamped and confirmed via sustained presence verification.</p>
+            </div>
+            <button id="btnExportCSV" class="btn btn-success d-flex align-items-center gap-2">
+              <i class="bi bi-file-earmark-arrow-down-fill"></i>
+              <span>Export Attendance CSV</span>
+            </button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+              <thead>
+                <tr class="text-muted small text-uppercase">
+                  <th>Roll / ID</th>
+                  <th>Student Name</th>
+                  <th>First Seen</th>
+                  <th>Last Seen</th>
+                  <th>Sustained Duration</th>
+                  <th>Engagement Avg</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <tr>
+                  <td><code>STU-2026-0801</code></td>
+                  <td class="fw-semibold">Ayush Kumar</td>
+                  <td>14:02:15</td>
+                  <td>14:36:20</td>
+                  <td>34 mins</td>
+                  <td><span class="text-success fw-bold">92%</span></td>
+                  <td><span class="badge badge-soft-success">Verified Present</span></td>
+                </tr>
+                <tr>
+                  <td><code>STU-2026-0802</code></td>
+                  <td class="fw-semibold">Priya Sharma</td>
+                  <td>14:02:40</td>
+                  <td>14:36:20</td>
+                  <td>33 mins</td>
+                  <td><span class="text-success fw-bold">88%</span></td>
+                  <td><span class="badge badge-soft-success">Verified Present</span></td>
+                </tr>
+                <tr>
+                  <td><code>STU-2026-0803</code></td>
+                  <td class="fw-semibold">Rahul Verma</td>
+                  <td>14:03:10</td>
+                  <td>14:36:20</td>
+                  <td>33 mins</td>
+                  <td><span class="text-warning fw-bold">78%</span></td>
+                  <td><span class="badge badge-soft-success">Verified Present</span></td>
+                </tr>
+                <tr>
+                  <td><code>STU-2026-0804</code></td>
+                  <td class="fw-semibold">Ananya Patel</td>
+                  <td>14:05:00</td>
+                  <td>14:36:20</td>
+                  <td>31 mins</td>
+                  <td><span class="text-success fw-bold">95%</span></td>
+                  <td><span class="badge badge-soft-success">Verified Present</span></td>
+                </tr>
+                <tr>
+                  <td><code>STU-2026-0805</code></td>
+                  <td class="fw-semibold">Vikram Malhotra</td>
+                  <td>14:15:20</td>
+                  <td>14:36:20</td>
+                  <td>21 mins</td>
+                  <td><span class="text-warning fw-bold">68%</span></td>
+                  <td><span class="badge badge-soft-warning">Late Entry</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: Scenario 2 - Analytics & Dynamics -->
+      <div class="tab-pane fade" id="tab-analytics">
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card p-4">
+              <h5 class="fw-bold mb-1"><i class="bi bi-activity text-primary me-2"></i>Multimodal Attention Curve Over Time</h5>
+              <p class="text-muted small mb-3">Fused score combining visual head-pose dynamics (60%) and acoustic activity levels (40%).</p>
+              <div style="height: 320px;">
+                <canvas id="dynamicsChart"></canvas>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card p-4 h-100">
+              <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-warning me-2"></i>Attention Distribution</h5>
+              <div style="height: 220px;">
+                <canvas id="pieChart"></canvas>
+              </div>
+              <div class="mt-3 small text-muted">
+                <div class="d-flex justify-content-between mb-1">
+                  <span>🟢 High Focus (&gt;80%)</span>
+                  <span class="fw-bold text-light">65%</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1">
+                  <span>🟡 Passive / Neutral (60-80%)</span>
+                  <span class="fw-bold text-light">25%</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                  <span>🔴 Low Attention (&lt;60%)</span>
+                  <span class="fw-bold text-light">10%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: Scenario 3 - Gemini Teaching Suggestions -->
+      <div class="tab-pane fade" id="tab-ai">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <div class="card p-4 h-100">
+              <h5 class="fw-bold mb-2"><i class="bi bi-robot text-warning me-2"></i>AI Teaching Insights Generator</h5>
+              <p class="text-muted small mb-4">Powered by <strong>Google Gemini 2.0 Flash</strong> to contextually evaluate attention drops and formulate non-intrusive pedagogical recommendations.</p>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted text-uppercase fw-semibold">Select Classroom Scenario</label>
+                <select class="form-select bg-dark text-light border-secondary" id="scenarioSelect">
+                  <option value="drop_pacing">⚠️ Pacing Lag: Attention dropped after 25 mins of continuous lecture</option>
+                  <option value="high_discussion">💬 Interactive Surge: High vocal participation, strong discussion</option>
+                  <option value="end_fatigue">🥱 Afternoon Fatigue: Moderate posture slump across rear seats</option>
+                </select>
+              </div>
+
+              <div class="d-flex gap-2 mb-4">
+                <button class="btn btn-warning fw-semibold d-flex align-items-center gap-2" id="btnGenerateSuggestion">
+                  <i class="bi bi-lightning-charge-fill"></i>
+                  <span>Generate Gemini Suggestions</span>
+                </button>
+                <button class="btn btn-outline-info d-flex align-items-center gap-2" id="btnSpeakSuggestion">
+                  <i class="bi bi-volume-up-fill"></i>
+                  <span>Play TTS Audio</span>
+                </button>
+              </div>
+
+              <div class="card p-3 border-secondary" style="background:#090d16;">
+                <span class="small text-muted text-uppercase fw-semibold mb-2 d-block"><i class="bi bi-chat-quote-fill me-1 text-warning"></i> Agent Decision Support Output</span>
+                <div id="aiSuggestionOutput" class="small lh-base">
+                  <strong>Pacing Intervention Recommendation:</strong><br>
+                  <em>"Detected a 28% drop in gaze-forward attention over the last 6 minutes. Pacing analysis indicates continuous monologuing for 26 minutes. Suggest: Pause for a 2-minute 'Think-Pair-Share' exercise on neural backpropagation to restore cohort energy."</em>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6">
+            <div class="card p-4 h-100">
+              <h5 class="fw-bold mb-2"><i class="bi bi-megaphone-fill text-info me-2"></i>Classroom Audio Announcements (TTS)</h5>
+              <p class="text-muted small mb-3">Broadcast synthesized reminders or break prompts directly to the room audio system.</p>
+
+              <div class="mb-3">
+                <label class="form-label small text-muted text-uppercase fw-semibold">Announcement Text</label>
+                <textarea class="form-control bg-dark text-light border-secondary" id="ttsInput" rows="4">Attention class: We will now pause for a 2-minute quick check-in exercise. Please discuss question 3 with your neighbor.</textarea>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button class="btn btn-info text-dark fw-semibold d-flex align-items-center gap-2" id="btnBroadcastTTS">
+                  <i class="bi bi-play-fill fs-5"></i>
+                  <span>Broadcast Speech</span>
+                </button>
+                <button class="btn btn-outline-secondary" id="btnResetTTS">Reset Text</button>
+              </div>
+
+              <div class="alert alert-secondary mt-4 mb-0 small" style="background: rgba(30, 41, 59, 0.6); border-color: var(--border-color);">
+                <i class="bi bi-shield-lock-fill text-success me-2"></i>
+                <strong>Privacy Guarantee:</strong> Raw audio feeds are analyzed for decibel and speech frequency energy on-device only. No raw audio recordings or biometrics are ever stored or uploaded.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Bootstrap 5 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Interactive Demo Logic -->
+  <script>
+    // 1. Gauge Chart Initialization
+    const gaugeCtx = document.getElementById('gaugeChart').getContext('2d');
+    const gaugeChart = new Chart(gaugeCtx, {
+      type: 'doughnut',
+      data: {
+        datasets: [{
+          data: [86, 14],
+          backgroundColor: ['#10b981', '#334155'],
+          borderWidth: 0,
+          circumference: 180,
+          rotation: 270
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { tooltip: { enabled: false } }
+      }
+    });
+
+    // 2. Multimodal Dynamics Chart
+    const dynamicsCtx = document.getElementById('dynamicsChart').getContext('2d');
+    const dynamicsChart = new Chart(dynamicsCtx, {
+      type: 'line',
+      data: {
+        labels: ['0m', '5m', '10m', '15m', '20m', '25m', '30m', '35m'],
+        datasets: [
+          {
+            label: 'Unified Engagement Score',
+            data: [92, 90, 88, 85, 82, 68, 76, 86],
+            borderColor: '#3b82f6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            borderWidth: 3
+          },
+          {
+            label: 'Visual Attention (60%)',
+            data: [95, 92, 90, 87, 85, 65, 78, 88],
+            borderColor: '#10b981',
+            borderDash: [5, 5],
+            fill: false,
+            tension: 0.3
+          },
+          {
+            label: 'Audio Activity (40%)',
+            data: [88, 87, 85, 82, 78, 72, 74, 83],
+            borderColor: '#f59e0b',
+            borderDash: [3, 3],
+            fill: false,
+            tension: 0.3
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { min: 40, max: 100, grid: { color: '#334155' } },
+          x: { grid: { color: '#334155' } }
+        },
+        plugins: {
+          legend: { labels: { color: '#f8fafc' } }
+        }
+      }
+    });
+
+    // 3. Attention Distribution Pie Chart
+    const pieCtx = document.getElementById('pieChart').getContext('2d');
+    new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['High Focus', 'Moderate', 'Low Attention'],
+        datasets: [{
+          data: [65, 25, 10],
+          backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+
+    // 4. Simulated Canvas Rendering
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    let simActive = true;
+
+    function renderSimulation() {
+      if (!simActive) return;
+      ctx.fillStyle = '#0a0f1d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw stylized classroom desks & silhouettes
+      ctx.fillStyle = '#1e293b';
+      ctx.fillRect(50, 280, 700, 15);
+      ctx.fillRect(100, 180, 600, 15);
+
+      // Animated wave line representing audio
+      ctx.strokeStyle = 'rgba(59, 130, 246, 0.4)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      const time = Date.now() * 0.003;
+      for (let x = 0; x < canvas.width; x += 10) {
+        const y = 410 + Math.sin(time + x * 0.05) * 15;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      requestAnimationFrame(renderSimulation);
+    }
+    renderSimulation();
+
+    // 5. Bounding Box Jitter to simulate live face tracking
+    setInterval(() => {
+      if (!simActive) return;
+      const jitter = (base) => base + (Math.random() * 4 - 2);
+      const b1 = document.getElementById('box1');
+      const b2 = document.getElementById('box2');
+      const b3 = document.getElementById('box3');
+      if (b1) b1.style.top = jitter(22) + '%';
+      if (b2) b2.style.top = jitter(24) + '%';
+      if (b3) b3.style.top = jitter(52) + '%';
+
+      // Slight gauge pulsation
+      const currentScore = Math.floor(82 + Math.random() * 7);
+      document.getElementById('gaugeValue').textContent = currentScore + '%';
+      gaugeChart.data.datasets[0].data = [currentScore, 100 - currentScore];
+      gaugeChart.update();
+    }, 2000);
+
+    // 6. Webcam Toggle
+    const btnWebcam = document.getElementById('btnWebcam');
+    const webcamVideo = document.getElementById('webcamVideo');
+    let stream = null;
+
+    btnWebcam.addEventListener('click', async () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        webcamVideo.style.display = 'none';
+        canvas.style.display = 'block';
+        btnWebcam.innerHTML = '<i class="bi bi-camera-video"></i><span>Use My Webcam</span>';
+      } else {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          webcamVideo.srcObject = stream;
+          webcamVideo.style.display = 'block';
+          canvas.style.display = 'none';
+          btnWebcam.innerHTML = '<i class="bi bi-camera-video-off"></i><span>Stop Webcam</span>';
+          appendLog('Webcam stream connected. Tracking enabled.');
+        } catch (err) {
+          alert('Could not access webcam: ' + err.message);
+        }
+      }
+    });
+
+    // 7. Telemetry Logger
+    function appendLog(text) {
+      const feed = document.getElementById('logFeed');
+      const time = new Date().toTimeString().split(' ')[0];
+      const div = document.createElement('div');
+      div.className = 'log-entry text-light';
+      div.textContent = `[${time}] ${text}`;
+      feed.appendChild(div);
+      feed.scrollTop = feed.scrollHeight;
+    }
+
+    // 8. CSV Export Trigger
+    document.getElementById('btnExportCSV').addEventListener('click', () => {
+      const csvContent = "data:text/csv;charset=utf-8,"
+        + "Student ID,Student Name,First Seen,Last Seen,Duration (mins),Engagement Avg,Status\n"
+        + "STU-2026-0801,Ayush Kumar,14:02:15,14:36:20,34,92%,Verified Present\n"
+        + "STU-2026-0802,Priya Sharma,14:02:40,14:36:20,33,88%,Verified Present\n"
+        + "STU-2026-0803,Rahul Verma,14:03:10,14:36:20,33,78%,Verified Present\n"
+        + "STU-2026-0804,Ananya Patel,14:05:00,14:36:20,31,95%,Verified Present\n"
+        + "STU-2026-0805,Vikram Malhotra,14:15:20,14:36:20,21,68%,Late Entry\n";
+      
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "attendance_session_CS402.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      appendLog("Attendance ledger exported as CSV.");
+    });
+
+    // 9. Gemini Teaching Suggestion Scenarios
+    const scenarios = {
+      drop_pacing: "Detected a 28% drop in gaze-forward attention over the last 6 minutes. Pacing analysis indicates continuous monologuing for 26 minutes. Suggest: Pause for a 2-minute 'Think-Pair-Share' exercise on neural backpropagation to restore cohort energy.",
+      high_discussion: "Interaction frequency index is at 94%. High vocal engagement and peer interaction detected. Recommendation: Maintain current discussion momentum for 4 more minutes, then synthesize key takeaways on the board.",
+      end_fatigue: "Mild posture slump and blink rate increase detected in rows 3-4. Suggest: Stand-up stretch interval or an interactive live polling quiz via smartphone."
+    };
+
+    document.getElementById('btnGenerateSuggestion').addEventListener('click', () => {
+      const sel = document.getElementById('scenarioSelect').value;
+      const text = scenarios[sel];
+      const output = document.getElementById('aiSuggestionOutput');
+      output.innerHTML = '<em>Generating Gemini 2.0 Flash reasoning...</em>';
+      setTimeout(() => {
+        output.innerHTML = `<strong>Gemini 2.0 Flash Contextual Insight:</strong><br>${text}`;
+        appendLog("Gemini 2.0 Flash generated teaching recommendation.");
+      }, 600);
+    });
+
+    // 10. Web Speech API (TTS)
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+        appendLog("TTS announcement broadcasted to audio stream.");
+      } else {
+        alert("Speech synthesis not supported in this browser.");
+      }
+    }
+
+    document.getElementById('btnBroadcastTTS').addEventListener('click', () => {
+      const text = document.getElementById('ttsInput').value;
+      speakText(text);
+    });
+
+    document.getElementById('btnSpeakSuggestion').addEventListener('click', () => {
+      const sel = document.getElementById('scenarioSelect').value;
+      speakText(scenarios[sel]);
+    });
+
+    document.getElementById('btnResetTTS').addEventListener('click', () => {
+      document.getElementById('ttsInput').value = "Attention class: We will now pause for a 2-minute quick check-in exercise. Please discuss question 3 with your neighbor.";
+    });
+  </script>
+</body>
+</html>

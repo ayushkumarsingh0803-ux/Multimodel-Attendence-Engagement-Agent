@@ -3,11 +3,15 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0-green?logo=flask)](https://flask.palletsprojects.com)
 [![Gemini AI](https://img.shields.io/badge/Google-Gemini%202.0%20Flash-orange?logo=google)](https://ai.google.dev)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen?logo=github)](https://ayushkumarsingh0803-ux.github.io/Multimodel-Attendence-Engagement-Agent/)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 [![Privacy First](https://img.shields.io/badge/Privacy-First%20Design-purple)](docs/ARCHITECTURE.md)
 [![Offline First](https://img.shields.io/badge/Offline-First-teal)](docs/ARCHITECTURE.md)
 
 > **A privacy-preserving, AI-powered classroom presence and engagement tracking system using multimodal signals — computer vision, audio analysis, and generative AI.**
+
+🌐 **Live Interactive Demo:** [https://ayushkumarsingh0803-ux.github.io/Multimodel-Attendence-Engagement-Agent/](https://ayushkumarsingh0803-ux.github.io/Multimodel-Attendence-Engagement-Agent/)
+
 
 ---
 
