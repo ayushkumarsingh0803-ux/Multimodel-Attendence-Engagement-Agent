@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance — Attendance Agent{% endblock %}
+{% block page_title %}Attendance Management{% endblock %}
+
+{% block content %}
+<!-- ── Controls Row ───────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-4">
+        <label class="form-label fw-semibold">Select Session</label>
+        <select class="form-select" id="sessionSelect" onchange="AttendanceController.loadSession(this.value)">
+            <option value="">— All Sessions —</option>
+            {% for s in sessions %}
+            <option value="{{ s.id }}">
+                {{ s.name }}
+                ({{ s.start_time.strftime('%b %d, %Y') if s.start_time else 'Unknown' }})
+                {% if s.status == 'active' %}🔴{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-12 col-md-3">
+        <label class="form-label fw-semibold">From Date</label>
+        <input type="date" class="form-control" id="filterDateFrom">
+    </div>
+    <div class="col-12 col-md-3">
+        <label class="form-label fw-semibold">To Date</label>
+        <input type="date" class="form-control" id="filterDateTo">
+    </div>
+    <div class="col-12 col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100" onclick="AttendanceController.applyFilters()">
+            <i class="bi bi-funnel me-1"></i> Filter
+        </button>
+    </div>
+</div>
+
+<!-- ── Summary Cards ─────────────────────────────────────────────────────── -->
+<div class="row g-3 mb-4" id="attendanceSummary">
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-0 bg-primary bg-opacity-10">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-primary" id="sumTotal">—</div>
+                <div class="small text-muted">Total Detected</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-0 bg-success bg-opacity-10">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-success" id="sumPresent">—</div>
+                <div class="small text-muted">Present</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-0 bg-warning bg-opacity-10">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-warning" id="sumAvgDuration">—</div>
+                <div class="small text-muted">Avg Duration (min)</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card text-center border-0 bg-info bg-opacity-10">
+            <div class="card-body py-3">
+                <div class="fs-3 fw-bold text-info" id="sumAvgEngagement">—</div>
+                <div class="small text-muted">Avg Engagement %</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Attendance Table ───────────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h6 class="mb-0">
+            <i class="bi bi-table text-secondary me-2"></i>
+            Attendance Records
+        </h6>
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control form-control-sm" id="tableSearch"
+                   placeholder="Search by ID..." style="width: 180px;"
+                   oninput="AttendanceController.searchTable(this.value)">
+            <button class="btn btn-sm btn-success" onclick="AttendanceController.exportCSV()">
+                <i class="bi bi-download me-1"></i> Export CSV
+            </button>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="attendanceTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Face ID</th>
+                        <th>Session</th>
+                        <th>First Seen</th>
+                        <th>Last Seen</th>
+                        <th>Duration</th>
+                        <th>Engagement</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTbody">
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="bi bi-person-x fs-2 d-block mb-2 opacity-25"></i>
+                            Select a session to view attendance records.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <span class="text-muted small" id="tableInfo">No records loaded.</span>
+        <div class="pagination-controls d-flex gap-2" id="paginationControls"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        AttendanceController.init();
+    });
+</script>
+{% endblock %}

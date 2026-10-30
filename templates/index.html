@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — Attendance Agent{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- ── Stat Cards ─────────────────────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon--blue">
+                    <i class="bi bi-calendar-event"></i>
+                </div>
+                <div class="stat-value" id="statTotalSessions">—</div>
+                <div class="stat-label">Total Sessions</div>
+                <div class="stat-change text-muted small" id="statSessionsChange"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon--green">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stat-value" id="statTotalAttendees">—</div>
+                <div class="stat-label">Total Attendees</div>
+                <div class="stat-change text-muted small">Across all sessions</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon--orange">
+                    <i class="bi bi-graph-up"></i>
+                </div>
+                <div class="stat-value" id="statAvgEngagement">—</div>
+                <div class="stat-label">Avg Engagement</div>
+                <div class="stat-change text-muted small">All sessions average</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card card h-100">
+            <div class="card-body">
+                <div class="stat-icon stat-icon--red">
+                    <i class="bi bi-record-circle"></i>
+                </div>
+                <div class="stat-value" id="statActiveSessions">—</div>
+                <div class="stat-label">Active Sessions</div>
+                <div class="stat-change text-muted small" id="activeSessionName"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts & Table Row ────────────────────────────────────────────────── -->
+<div class="row g-4 mb-4">
+    <!-- Engagement Trend Chart -->
+    <div class="col-12 col-xl-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="bi bi-graph-up-arrow text-primary me-2"></i>
+                    Engagement Trend (Last 7 Days)
+                </h6>
+                <button class="btn btn-sm btn-outline-secondary" onclick="DashboardController.loadTrendChart()">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh
+                </button>
+            </div>
+            <div class="card-body">
+                <canvas id="engagementTrendChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-12 col-xl-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-lightning text-warning me-2"></i>
+                    Quick Actions
+                </h6>
+            </div>
+            <div class="card-body d-flex flex-column gap-3">
+                <a href="{{ url_for('session') }}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-circle me-2"></i>
+                    Start New Session
+                </a>
+                <a href="{{ url_for('attendance') }}" class="btn btn-outline-success">
+                    <i class="bi bi-person-check me-2"></i>
+                    View Attendance
+                </a>
+                <a href="{{ url_for('engagement') }}" class="btn btn-outline-info">
+                    <i class="bi bi-graph-up me-2"></i>
+                    View Reports
+                </a>
+                <button class="btn btn-outline-secondary" id="refreshDashboardBtn"
+                        onclick="DashboardController.refresh()">
+                    <i class="bi bi-arrow-clockwise me-2"></i>
+                    Refresh Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Recent Sessions Table ─────────────────────────────────────────────── -->
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h6 class="mb-0">
+            <i class="bi bi-clock-history text-secondary me-2"></i>
+            Recent Sessions
+        </h6>
+        <span class="badge bg-light text-dark" id="recentSessionsCount">Loading...</span>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0" id="recentSessionsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Session Name</th>
+                        <th>Start Time</th>
+                        <th>Duration</th>
+                        <th>Attendees</th>
+                        <th>Avg Engagement</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="recentSessionsTbody">
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <div class="spinner-border spinner-border-sm me-2"></div>
+                            Loading sessions...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Dashboard-specific initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+        DashboardController.init();
+    });
+</script>
+{% endblock %}

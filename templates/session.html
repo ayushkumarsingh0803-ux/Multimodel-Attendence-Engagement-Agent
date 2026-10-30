@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Live Session — Attendance Agent{% endblock %}
+{% block page_title %}Live Session Control{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- ── Left Column: Controls ─────────────────────────────────────────── -->
+    <div class="col-12 col-xl-4">
+
+        <!-- Session Controls -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-play-circle text-success me-2"></i>
+                    Session Controls
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="noSessionPanel">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Session Name</label>
+                        <input type="text" class="form-control" id="sessionNameInput"
+                               placeholder="e.g., CS101 — Lecture 7"
+                               value="Session {{ now.strftime('%b %d %H:%M') if now else '' }}">
+                    </div>
+                    <button class="btn btn-success w-100 btn-lg" id="startSessionBtn"
+                            onclick="SessionController.start()">
+                        <i class="bi bi-play-fill me-2"></i>
+                        Start Session
+                    </button>
+                </div>
+
+                <div id="activeSessionPanel" class="d-none">
+                    <div class="alert alert-success d-flex align-items-center mb-3">
+                        <span class="session-pulse me-2"></span>
+                        <div>
+                            <strong>Session Active</strong><br>
+                            <span class="small" id="activeSessionNameDisplay">—</span>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 mb-2 small text-muted">
+                        <span><i class="bi bi-clock me-1"></i>Started: <span id="sessionStartTime">—</span></span>
+                    </div>
+                    <button class="btn btn-danger w-100" id="stopSessionBtn"
+                            onclick="SessionController.stop()">
+                        <i class="bi bi-stop-fill me-2"></i>
+                        Stop Session
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time Stats -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-activity text-primary me-2"></i>
+                    Real-time Stats
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="stat-row">
+                    <div class="stat-row__label">
+                        <i class="bi bi-people text-primary me-1"></i> Face Count
+                    </div>
+                    <div class="stat-row__value" id="rtFaceCount">—</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-row__label">
+                        <i class="bi bi-graph-up text-success me-1"></i> Engagement
+                    </div>
+                    <div class="stat-row__value">
+                        <span id="rtEngagementScore">—</span>
+                        <span class="engagement-badge ms-1" id="rtEngagementLevel"></span>
+                    </div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-row__label">
+                        <i class="bi bi-mic text-warning me-1"></i> Audio Activity
+                    </div>
+                    <div class="stat-row__value" id="rtAudioActivity">—</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-row__label">
+                        <i class="bi bi-clock text-info me-1"></i> Session Duration
+                    </div>
+                    <div class="stat-row__value" id="rtDuration">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Text-to-Speech Panel -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="bi bi-megaphone text-warning me-2"></i>
+                    TTS Announcements
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <textarea class="form-control" id="ttsText" rows="3"
+                              placeholder="Type an announcement..."></textarea>
+                </div>
+                <button class="btn btn-warning w-100" onclick="TTSController.send()">
+                    <i class="bi bi-volume-up me-1"></i> Speak Announcement
+                </button>
+                <div id="ttsAudioPlayer" class="mt-3 d-none">
+                    <audio controls class="w-100" id="ttsAudio"></audio>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Right Column: Upload + Gauge + Log ────────────────────────────── -->
+    <div class="col-12 col-xl-8">
+
+        <!-- Video Upload -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="bi bi-camera-video text-danger me-2"></i>
+                    Video Upload & Processing
+                </h6>
+                <span class="badge bg-light text-dark small">MP4 / AVI / MOV / MKV</span>
+            </div>
+            <div class="card-body">
+                <div class="upload-dropzone" id="uploadDropzone">
+                    <div class="upload-dropzone__inner" id="dropzoneInner">
+                        <i class="bi bi-cloud-upload fs-1 text-muted mb-2 d-block"></i>
+                        <p class="mb-1 fw-semibold">Drag & drop a classroom video here</p>
+                        <p class="text-muted small mb-3">or click to browse — max 500 MB</p>
+                        <input type="file" id="videoFileInput" accept="video/*" class="d-none">
+                        <button class="btn btn-outline-primary btn-sm"
+                                onclick="document.getElementById('videoFileInput').click()">
+                            Browse Files
+                        </button>
+                    </div>
+                    <div id="fileSelectedInfo" class="d-none mt-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-film text-primary"></i>
+                            <span id="selectedFileName" class="fw-semibold"></span>
+                            <button class="btn btn-sm btn-link text-danger p-0" onclick="VideoUploader.clearFile()">
+                                <i class="bi bi-x-circle"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="mt-3 d-none" id="uploadProgressContainer">
+                    <div class="d-flex justify-content-between mb-1">
+                        <small class="text-muted" id="uploadProgressLabel">Uploading...</small>
+                        <small id="uploadProgressPct">0%</small>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary"
+                             id="uploadProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <button class="btn btn-danger mt-3 w-100" id="processVideoBtn"
+                        onclick="VideoUploader.upload()" disabled>
+                    <i class="bi bi-cpu me-2"></i>
+                    Process Video
+                </button>
+
+                <!-- Processing Results -->
+                <div id="processingResults" class="mt-3 d-none">
+                    <div class="alert alert-success mb-0">
+                        <h6 class="alert-heading mb-2">
+                            <i class="bi bi-check-circle me-1"></i> Processing Complete
+                        </h6>
+                        <div class="row g-2 text-center">
+                            <div class="col-4">
+                                <div class="fw-bold" id="resFrames">—</div>
+                                <div class="small text-muted">Frames</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold" id="resAttendees">—</div>
+                                <div class="small text-muted">Attendees</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="fw-bold" id="resEngagement">—</div>
+                                <div class="small text-muted">Avg Engagement</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Engagement Gauge + Log Row -->
+        <div class="row g-4">
+            <!-- Live Engagement Gauge -->
+            <div class="col-12 col-md-5">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-speedometer text-success me-2"></i>
+                            Live Engagement Gauge
+                        </h6>
+                    </div>
+                    <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                        <div style="max-width: 200px; width: 100%;">
+                            <canvas id="engagementGauge"></canvas>
+                        </div>
+                        <div class="mt-3 text-center">
+                            <div class="fs-2 fw-bold" id="gaugeScoreDisplay">—</div>
+                            <div class="text-muted small">Engagement Score</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Session Log -->
+            <div class="col-12 col-md-7">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="bi bi-terminal text-secondary me-2"></i>
+                            Session Log
+                        </h6>
+                        <button class="btn btn-sm btn-outline-secondary"
+                                onclick="SessionLog.clear()">
+                            <i class="bi bi-trash3"></i>
+                        </button>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="session-log" id="sessionLog">
+                            <div class="log-entry log-entry--info">
+                                <span class="log-time">—</span>
+                                <span class="log-msg">System ready. Start a session to begin tracking.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/session.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        SessionController.init();
+        VideoUploader.init();
+        LiveEngagementGauge.init('engagementGauge');
+        SessionLog.init('sessionLog');
+        TTSController.init();
+    });
+</script>
+{% endblock %}

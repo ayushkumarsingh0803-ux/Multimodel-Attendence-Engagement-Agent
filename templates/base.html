@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Multimodal Attendance Agent{% endblock %}</title>
+
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- ── Sidebar ──────────────────────────────────────────────────────── -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="bi bi-mortarboard-fill"></i>
+                <span class="sidebar-brand">AttendanceAI</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if page == 'dashboard' %}active{% endif %}"
+                       href="{{ url_for('dashboard') }}">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if page == 'session' %}active{% endif %}"
+                       href="{{ url_for('session') }}">
+                        <i class="bi bi-play-circle"></i>
+                        <span>Live Session</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if page == 'attendance' %}active{% endif %}"
+                       href="{{ url_for('attendance') }}">
+                        <i class="bi bi-person-check"></i>
+                        <span>Attendance</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if page == 'engagement' %}active{% endif %}"
+                       href="{{ url_for('engagement') }}">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <span>Engagement</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-divider"></div>
+
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                        <i class="bi bi-info-circle"></i>
+                        <span>About</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="privacy-badge">
+                <i class="bi bi-shield-check"></i>
+                <span>Privacy-First</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Main Content ─────────────────────────────────────────────────── -->
+    <div class="main-content" id="mainContent">
+
+        <!-- Top Navbar -->
+        <nav class="top-navbar navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <button class="btn btn-link sidebar-toggle" id="sidebarToggle">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+
+                <span class="navbar-text fw-semibold text-dark ms-2">
+                    {% block page_title %}Dashboard{% endblock %}
+                </span>
+
+                <div class="ms-auto d-flex align-items-center gap-3">
+                    <!-- System Status Indicator -->
+                    <div class="status-indicator" id="systemStatus">
+                        <span class="status-dot status-dot--online" id="statusDot"></span>
+                        <span class="status-label" id="statusLabel">System Online</span>
+                    </div>
+
+                    <!-- Active Session Badge -->
+                    <div class="d-none" id="activeSessionBadge">
+                        <span class="badge bg-danger">
+                            <i class="bi bi-record-circle"></i>
+                            Session Active
+                        </span>
+                    </div>
+
+                    <div class="vr"></div>
+                    <span class="text-muted small">
+                        <i class="bi bi-clock me-1"></i>
+                        <span id="currentTime"></span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Flash Messages -->
+        <div class="flash-container px-4 pt-3">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
+                            <i class="bi bi-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' }} me-2"></i>
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Page Content -->
+        <div class="page-content px-4 py-3">
+            {% block content %}{% endblock %}
+        </div>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <div class="container-fluid">
+                <span class="text-muted small">
+                    🎓 Multimodal Attendance Agent &nbsp;|&nbsp; Privacy-First AI
+                    &nbsp;|&nbsp; Powered by Google Gemini 2.0 Flash
+                </span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- ── About Modal ──────────────────────────────────────────────────── -->
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title">
+                        <i class="bi bi-mortarboard-fill text-primary me-2"></i>
+                        About Multimodal Attendance Agent
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">
+                        An AI-powered classroom attendance and engagement tracking system
+                        using computer vision, audio analysis, and Google Gemini 2.0 Flash.
+                    </p>
+                    <div class="row g-2 text-center mb-3">
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-light">
+                                <i class="bi bi-eye text-primary fs-4"></i>
+                                <div class="small mt-1">Vision AI</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-light">
+                                <i class="bi bi-mic text-success fs-4"></i>
+                                <div class="small mt-1">Audio AI</div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="p-2 rounded bg-light">
+                                <i class="bi bi-shield-check text-warning fs-4"></i>
+                                <div class="small mt-1">Privacy-First</div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-lock me-1"></i>
+                        All biometric processing runs locally. Only anonymised metrics
+                        are sent to Gemini API.
+                    </p>
+                </div>
+                <div class="modal-footer border-0">
+                    <span class="text-muted small">MIT License © 2024</span>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Main JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    <script>
+        // Live clock
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent =
+                now.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.getElementById('mainContent').classList.toggle('expanded');
+        });
+
+        // Check session status for badge
+        async function checkActiveSession() {
+            try {
+                const res = await fetch('/api/session-status');
+                const data = await res.json();
+                const badge = document.getElementById('activeSessionBadge');
+                if (data.active) {
+                    badge.classList.remove('d-none');
+                } else {
+                    badge.classList.add('d-none');
+                }
+            } catch (e) { /* ignore */ }
+        }
+        checkActiveSession();
+        setInterval(checkActiveSession, 10000);
+    </script>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>
